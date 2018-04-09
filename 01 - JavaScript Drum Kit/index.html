@@ -2,11 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>JS Drum Kit</title>
+  <title>CRS Rock Kit</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <div class="options">
+    
+    <!--
+      This should change all audio sources and key labvels to a specific instrument.
+    -->
+    <select>
+      <option selected>DRUMS</option>
+    </select>
+  </div>
 
   <div class="keys">
     <div data-key="65" class="key">
@@ -57,26 +66,7 @@
   <audio data-key="75" src="sounds/tom.wav"></audio>
   <audio data-key="76" src="sounds/tink.wav"></audio>
 
-<script>
-  function removeTransition(e) {
-    if (e.propertyName !== 'transform') return;
-    e.target.classList.remove('playing');
-  }
-
-  function playSound(e) {
-    const audio = document.querySelector(`audio[data-key="${e.keyCode}"]`);
-    const key = document.querySelector(`div[data-key="${e.keyCode}"]`);
-    if (!audio) return;
-
-    key.classList.add('playing');
-    audio.currentTime = 0;
-    audio.play();
-  }
-
-  const keys = Array.from(document.querySelectorAll('.key'));
-  keys.forEach(key => key.addEventListener('transitionend', removeTransition));
-  window.addEventListener('keydown', playSound);
-</script>
+  <script src="./js/crsRockKit.js"></script>
 
 
 </body>
