@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="City or State">
+    <ul class="suggestions">
+      <li>Filter for a city</li>
+      <li>or a state</li>
+    </ul>
+  </form>
+<script>
+const model = (function() {
+  const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json';
+  
+  function fetchData() {
+    const fetched = [];
+    return fetch(endpoint)
+        .then(blob => blob.json())
+        .then(data => {
+          fetched.push(...data); 
+          return fetched;
+        }
+      );
+  }
+
+  return {
+    getData(){
+      return fetchData();
+    },
+    /**
+     * toMatch - string
+     * findIn - object
+     * field - [string]
+     */
+    findMatches(toMatch, findIn, field) {
+      let matches = [];
+      return findIn.filter( obj => {
+        const regex = new RegExp(toMatch, 'gi');
+        return obj[field].match(regex);
+      });
+    }
+  };
+})();
+
+const pageManager = (function() {
+  const searchInput = document.querySelector('.search');
+  const suggestions = document.querySelector('.suggestions');
+  const fields = ['city', 'state'];
+  const srcList = [];
+  function _displayMatches(val) {
+    let matches = [];
+    fields.forEach(field => {
+      matches = matches.concat(model.findMatches(val, srcList, field));
+    });
+    const htmlOut = matches.map(place => {
+      return `
+        <li>
+          <span class="name">${place.city}, ${place.state}</span>
+          <span class="population">${place.population}</span>
+        </li>
+      `;
+    }).join('');
+    suggestions.innerHTML = htmlOut;
+  }
+  return {
+    initPage() {
+      searchInput.addEventListener('keyup', (e) => {
+        _displayMatches(e.target.value);
+      });
+    },
+    setDataSource(d) {
+      srcList.length = 0;
+      srcList.push(...d);
+    }
+  };
+})();
+
+model.getData()
+  .then(data => {
+    const cities = [];
+    
+    let matches = [];
+    cities.push(...data);
+    pageManager.setDataSource(cities);
+    pageManager.initPage();
+});
+
+
+</script>
+  </body>
+</html>
