@@ -53,16 +53,27 @@ const pageManager = (function() {
   const suggestions = document.querySelector('.suggestions');
   const fields = ['city', 'state'];
   const srcList = [];
+
+
+  function _numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+
   function _displayMatches(val) {
     let matches = [];
     fields.forEach(field => {
       matches = matches.concat(model.findMatches(val, srcList, field));
     });
     const htmlOut = matches.map(place => {
+      const regex = new RegExp(val, 'gi');
+      const cityName = place.city.replace(regex, `<span class="hl">${val}</span>`);
+      const stateName = place.state.replace(regex, `<span class="hl">${val}</span>`);
+      const population = _numberWithCommas(place.population);
       return `
         <li>
-          <span class="name">${place.city}, ${place.state}</span>
-          <span class="population">${place.population}</span>
+          <span class="name">${cityName}, ${stateName}</span>
+          <span class="population">${population}</span>
         </li>
       `;
     }).join('');
